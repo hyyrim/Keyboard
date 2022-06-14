@@ -27,6 +27,28 @@ export class Keyboard {
     // this가 전역객체, window를 바라보게됨 -> bind 사용 (class의 this를 바라봄)
     document.addEventListener("keyup", this.#onKeyUp.bind(this));
     this.#inputEl.addEventListener("input", this.#onInput.bind(this));
+    this.#keyboardEl.addEventListener("mousedown", this.#onMouseDown);
+    document.addEventListener("mouseup", this.#onMouseUp.bind(this)); // 키보드 밖에서 마우스를 뗄수도있기때문에 document사용
+  }
+
+  #onMouseDown(event) {
+    event.target.closest("div.key")?.classList.add("active");
+  }
+
+  #onMouseUp(event) {
+    const keyEl = event.target.closest("div.key");
+    const isActive = !!keyEl?.classList.contains("active");
+    const val = keyEl?.dataset.val; // data-val
+    if (isActive && !!val && val !== "Space" && val !== "Backspace") {
+      this.#inputEl.value += val;
+    }
+    if (isActive && val === "Space") {
+      this.#inputEl.value += " ";
+    }
+    if (isActive && val === "Backspace") {
+      this.#inputEl.value = this.#inputEl.value.slice(0, -1);
+    }
+    this.#keyboardEl.querySelector(".active")?.classList.remove("active");
   }
 
   #onInput(event) {
